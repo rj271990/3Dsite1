@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/locomotive-scroll@3.5.4/dist/locomotive-scroll.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #fff;
+    }
+
+    #nav {
+      position: relative;
+      text-align: center;
+      padding: 20px;
+      background: #fff;
+      z-index: 10;
+    }
+
+    /* Sections */
+    #leftSection, #rightSection {
+      width: 320px;
+      background: white;
+      color: black;
+      border: none;
+      box-shadow: none;
+      opacity: 0.8;
+      transition: opacity 0.5s ease;
+      z-index: 999;
+      border-radius: 10px;
+      padding: 20px;
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    #leftSection { left: 20px; }
+    #rightSection { right: 20px; }
+    #leftSection h3, #rightSection h3 {
+      margin-bottom: 15px;
+      text-align: center;
+      font-size: 1.2rem;
+    }
+
+    .skill-item, .contact-item {
+      margin-bottom: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.3s ease;
+      cursor: pointer;
+    }
+
+    .contact-item:hover { background: rgba(0,0,0,0.1); }
+    .contact-item i { font-size: 1.2rem; width: 20px; }
+    .contact-item a { text-decoration: none; color: black; }
+    .contact-item a:hover { color: #333; }
+
+    /* Photos wrapper */
+    #photosWrapper {
+      display: flex;
+      justify-content: space-between;
+      max-width: 1500px;
+      margin: 200px auto 40px auto; /* top margin pushes photos below sections */
+      gap: 40px; /* space between photos */
+      flex-wrap: wrap;
+    }
+
+    #photosWrapper img {
+      width: 520px;
+      border-radius: 10px;
+      display: block;
+    }
+
+    /* Avatar */
+    #avatar {
+      display: block;
+      margin: 0px ;
+      width: 320px; /* match section width */
+      height: 320px;
+      border-radius: 50%;
+      object-fit: contain; /* show entire avatar */
+      background: transparent; /* ensure transparency */
+    }
+
+    /* Footer */
+    #footer {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      color: black;
+      padding: 15px 20px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      z-index: 999;
+    }
+
+    /* Contact Form - bottom right */
+    #bottomForm {
+      position: fixed;
+      bottom: 100px; /* above footer */
+      right: 20px;
+      width: 300px;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      z-index: 998;
+    }
+    #bottomForm input, #bottomForm textarea {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 0.9rem;
+    }
+    #bottomForm button {
+      width: 100%;
+      padding: 10px;
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    /* Mobile fixes */
+    @media (max-width: 768px) {
+      #leftSection, #rightSection {
+        position: static !important;
+        width: calc(100% - 40px) !important;
+        margin: 20px auto !important;
+        transform: none !important;
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+      }
+
+      @media (max-width:768px) {
+    #contactForm {
+    position: static !important;  /* overrides fixed positioning */
+    width: calc(100% - 40px) !important; /* full width minus padding */
+    margin: 10 auto !important; /* space above and below */
+    right: auto !important;
+    bottom: auto !important;
+}
+
+      }
+      #leftSection { margin-top: 50px !important; }
+
+      #photosWrapper { flex-direction: column !important; }
+      #photosWrapper img { width: 80% !important; margin: 10px auto !important; }
+
+      #avatar { width: 150px !important; height: 150px !important; }
+      #footer { position: static !important; width: calc(100% - 40px) !important; margin: 20px auto !important; text-align: center !important; }
+      #bottomForm { width: calc(100% - 40px); bottom: 120px; right: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="nav">
+  <h3><b>Rami</b>Jabbar</h3>
+  <button>2025</button>
+</div>
+
+<div id="main">
+
+  <!-- Hero Section -->
+  <div id="page">
+    <div id="loop">
+      <h1><b>3D</b>WEB <b><i>DESIGN </i></b> <span>BY</span> RAMI <span><i>JABBAR</i></span></h1>
+      <h1><b>3D</b>WEB <b><i>DESIGN </i></b> <span>BY</span> RAMI <span><i>JABBAR</i></span></h1>
+      <h1><b>3D</b>WEB <b><i>DESIGN </i></b> <span>BY</span> RAMI <span><i>JABBAR</i></span></h1>
+    </div>
+    <h3>WE CREATE ANY WEBSITE YOU IMAGINE NOTHING IS IMPOSSIBLE<br>
+      WE ARE EXPERT IN FULL-STACK WEBSITE DEVELOPMENT, SEO, GOOGLE ADS, <br>
+      AND MORE.
+    </h3>
+    <h4>...SCROLL TO read</h4>
+    <canvas></canvas>
+
+    <img id="avatar" src="./avatar.png" alt="avatar">
+  </div>
+
+  <!-- Skills Section -->
+  <div id="leftSection">
+    <h3><i class="fas fa-code"></i> Skills & Experience</h3>
+    <div class="skill-item">
+      <strong>Frontend:</strong><br>
+      <small>HTML5, CSS3, Flexbox, Grid, Bootstrap 5, JavaScript ES6, DOM Manipulation, jQuery, React.js, React Hooks</small>
+    </div>
+    <div class="skill-item">
+      <strong>Backend:</strong><br>
+      <small>Node.js, Express.js, NPM, EJS, REST, APIs, Authentication</small>
+    </div>
+    <div class="skill-item">
+      <strong>3D, Design & Database:</strong><br>
+      <small>SQL, PostgreSQL, Git, GitHub, Version Control, Bash Command Line, Web Design, GitHub Pages, Responsive Design</small>
+    </div>
+    <div class="skill-item">
+      <strong>Experience:</strong><br>
+      <small>Certified Full-Stack Development | Sample Web Projects - https://RamiJ.netlify.app & https://Budgetfind.netlify.app</small>
+    </div>
+  </div>
+
+  <!-- Contact Section -->
+  <div id="rightSection">
+    <h3><i class="fas fa-envelope"></i> Contact Me</h3>
+    <div class="contact-item">
+      <i class="fab fa-facebook"></i>
+      <a href="https://www.facebook.com/people/Rami-J/100091851456143/" target="_blank">Facebook</a>
+    </div>
+    <div class="contact-item">
+      <i class="fab fa-linkedin"></i>
+      <a href="https://www.linkedin.com/in/rami-jabbar-b28467b9" target="_blank">LinkedIn</a>
+    </div>
+    <div class="contact-item">
+      <i class="fas fa-envelope"></i>
+      <a href="mailto:ramijabbar@gmail.com">Email Me</a>
+    </div>
+  </div>
+
+  <!-- Photos Under Sections -->
+  <div id="photosWrapper">
+    <img src="./Screenshot 2025-09-20 160531.png" alt="Left photo">
+    <img src="./Screenshot 2025-09-20 161101.png" alt="Right photo">
+  </div>
+
+  <!-- Bottom Right Form -->
+  <div id="bottomForm">
+  <form action="https://formspree.io/f/mblzroly" method="POST">
+    <input type="email" name="email" placeholder="Your Email" required>
+    <textarea name="message" placeholder="Your Message" rows="3" required></textarea>
+    <button type="submit">Send</button>
+  </form>
+</div>
+
+
+  <!-- Page content placeholders for scrolling -->
+  <div style="height:2000px;"></div>
+
+  <!-- Footer -->
+  <div id="footer">
+    <div>© 2025 Rami Jabbar</div>
+    <div>3D Web Designer</div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@3.5.4/dist/locomotive-scroll.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
