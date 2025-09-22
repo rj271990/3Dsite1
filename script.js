@@ -1,59 +1,149 @@
-function locomotive() {
+// ----- stable-locomotive + ScrollTrigger integration (copy-paste this whole file) -----
+(function () {
   gsap.registerPlugin(ScrollTrigger);
 
-  const locoScroll = new LocomotiveScroll({
-    el: document.querySelector("#main"),
-    smooth: true,
-  });
-  locoScroll.on("scroll", ScrollTrigger.update);
+  const mainScroller = document.querySelector("#main");
+  const canvas = document.querySelector("canvas");
+  const context = canvas.getContext("2d");
 
-  ScrollTrigger.scrollerProxy("#main", {
-    scrollTop(value) {
-      return arguments.length
-        ? locoScroll.scrollTo(value, 0, 0)
-        : (locoScroll.scroll.instance.scroll.y || 0); // safer for mobile
-    },
+  // mobile detection (tweak breakpoint if you want)
+  const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  ) || window.innerWidth < 768;
 
-    getBoundingClientRect() {
-      return {
-        top: 0,
-        left: 0,
-        width: window.innerWidth,
-        height: window.innerHeight,
-      };
-    },
+  let locoScroll = null;
 
-    // Force transform pinning so mobile doesn't snap back
-    pinType: "transform",
-  });
+  function safeScrollTo(value) {
+    if (!locoScroll) {
+      // fallback to native
+      if (mainScroller) mainScroller.scrollTop = value;
+      else window.scrollTo(0, value);
+      return;
+    }
+    // try common loco signatures safely
+    try {
+      // older signature: locoScroll.scrollTo(value, 0, 0)
+      locoScroll.scrollTo(value, 0, 0);
+      return;
+    } catch (e) {}
+    try {
+      // newer signature: locoScroll.scrollTo(target, options)
+      locoScroll.scrollTo(value, { offset: 0, duration: 0 });
+      return;
+    } catch (e) {}
+    // last resort
+    if (mainScroller) mainScroller.scrollTop = value;
+    else window.scrollTo(0, value);
+  }
 
-  ScrollTrigger.addEventListener("refresh", () => locoScroll.update());
+  function safeGetLocoY() {
+    if (!locoScroll) return (mainScroller && mainScroller.scrollTop) || window.pageYOffset || 0;
 
-  // Refresh after everything loads
-  window.addEventListener("load", () => {
-    locoScroll.update();
+    // try multiple internals used across versions
+    try {
+      if (locoScroll.scroll && locoScroll.scroll.instance && locoScroll.scroll.instance.scroll && typeof locoScroll.scroll.instance.scroll.y === "number") {
+        return locoScroll.scroll.instance.scroll.y;
+      }
+    } catch (e) {}
+    try {
+      if (typeof locoScroll.scrollY === "number") return locoScroll.scrollY;
+    } catch (e) {}
+    try {
+      if (locoScroll.scroll && typeof locoScroll.scroll.y === "number") return locoScroll.scroll.y;
+    } catch (e) {}
+    // final fallback to container scrollTop
+    return (mainScroller && mainScroller.scrollTop) || window.pageYOffset || 0;
+  }
+
+  function initLocomotive() {
+    if (!mainScroller) {
+      console.warn("No #main element found. Scroll features will fallback to native.");
+      attachScrollProxy();
+      return;
+    }
+
+    if (typeof LocomotiveScroll !== "undefined") {
+      try {
+        locoScroll = new LocomotiveScroll({
+          el: mainScroller,
+          smooth: !isMobile,
+          // ensure mobile/tablet internal flags are set to avoid unwanted smooth behavior
+          smartphone: { smooth: false },
+          tablet: { smooth: false },
+        });
+
+        locoScroll.on("scroll", ScrollTrigger.update);
+      } catch (err) {
+        console.warn("LocomotiveScroll init failed, falling back to native scroll.", err);
+        locoScroll = null;
+      }
+    } else {
+      locoScroll = null;
+    }
+
+    attachScrollProxy();
+  }
+
+  function attachScrollProxy() {
+    // scrollerProxy must be present even when locoScroll is null (we provide safe fallbacks)
+    ScrollTrigger.scrollerProxy("#main", {
+      scrollTop(value) {
+        if (arguments.length) {
+          // setter
+          safeScrollTo(value);
+        } else {
+          // getter
+          return safeGetLocoY();
+        }
+      },
+      getBoundingClientRect() {
+        return {
+          top: 0,
+          left: 0,
+          width: window.innerWidth,
+          height: window.innerHeight,
+        };
+      },
+      // if loco is active and not mobile-smooth-fallback, use transform pinning, otherwise use fixed
+      pinType: locoScroll && !isMobile ? "transform" : "fixed",
+    });
+
+    ScrollTrigger.addEventListener("refresh", () => {
+      if (locoScroll && typeof locoScroll.update === "function") {
+        locoScroll.update();
+      }
+    });
+
+    // After everything loads, make sure sizes / states are correct
+    window.addEventListener("load", () => {
+      if (locoScroll && typeof locoScroll.update === "function") locoScroll.update();
+      ScrollTrigger.refresh();
+    });
+  }
+
+  initLocomotive();
+
+  // Responsive refresh
+  window.addEventListener("resize", () => {
+    // optional: if you want to re-detect isMobile on resize/orientation change, you can reload or re-init
+    // We'll just refresh here
+    if (locoScroll && typeof locoScroll.update === "function") locoScroll.update();
     ScrollTrigger.refresh();
+    // update canvas size too
+    updateCanvasSize();
+    render();
   });
 
-  ScrollTrigger.refresh();
-}
-locomotive();
+  // Canvas setup & image sequence logic (kept similar to your original but safer)
+  function updateCanvasSize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  updateCanvasSize();
 
-
-const canvas = document.querySelector("canvas");
-const context = canvas.getContext("2d");
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-window.addEventListener("resize", function () {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  render();
-});
-
-function files(index) {
-  var data = `
+  // your original file list (unchanged)
+  function files(index) {
+    var data = `
      ./male0001.png
      ./male0002.png
      ./male0003.png
@@ -355,67 +445,93 @@ function files(index) {
      ./male0299.png
      ./male0300.png
  `;
-  return data.split("\n")[index];
-}
+    return data.split("\n")[index];
+  }
 
-const frameCount = 300;
+  const frameCount = 300;
+  const images = [];
+  const imageSeq = { frame: 1 };
 
-const images = [];
-const imageSeq = {
-  frame: 1,
-};
+  for (let i = 0; i < frameCount; i++) {
+    const img = new Image();
+    img.src = files(i);
+    images.push(img);
+  }
 
-for (let i = 0; i < frameCount; i++) {
-  const img = new Image();
-  img.src = files(i);
-  images.push(img);
-}
+  // safer render() - only draws when image is loaded; tries to fallback to last loaded image if needed
+  function render() {
+    let img = images[imageSeq.frame];
+    if (!img || !img.complete || img.naturalWidth === 0) {
+      // try to find nearest loaded image (backwards)
+      for (let j = imageSeq.frame; j >= 0; j--) {
+        const alt = images[j];
+        if (alt && alt.complete && alt.naturalWidth > 0) {
+          img = alt;
+          break;
+        }
+      }
+      if (!img || !img.complete || img.naturalWidth === 0) {
+        // nothing available yet
+        return;
+      }
+    }
+    scaleImage(img, context);
+  }
 
-gsap.to(imageSeq, {
-  frame: frameCount - 1,
-  snap: "frame",
-  ease: `none`,
-  scrollTrigger: {
-    scrub: 0.15,
-    trigger: `#page>canvas`,
-    start: `top top`,
-    end: `600% top`,
-    scroller: `#main`,
-  },
-  onUpdate: render,
-});
+  function scaleImage(img, ctx) {
+    var canvas = ctx.canvas;
+    var hRatio = canvas.width / img.width;
+    var vRatio = canvas.height / img.height;
+    var ratio = Math.max(hRatio, vRatio);
+    var centerShift_x = (canvas.width - img.width * ratio) / 2;
+    var centerShift_y = (canvas.height - img.height * ratio) / 2;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(
+      img,
+      0,
+      0,
+      img.width,
+      img.height,
+      centerShift_x,
+      centerShift_y,
+      img.width * ratio,
+      img.height * ratio
+    );
+  }
 
-images[1].onload = render;
+  // GSAP animation - scroller is #main (works with loco or native)
+  gsap.to(imageSeq, {
+    frame: frameCount - 1,
+    snap: "frame",
+    ease: "none",
+    scrollTrigger: {
+      scrub: 0.15,
+      trigger: "#page>canvas",
+      start: "top top",
+      end: isMobile ? "400% top" : "600% top", // shorter on mobile to avoid extreme pin ranges
+      scroller: "#main",
+    },
+    onUpdate: render,
+  });
 
-function render() {
-  scaleImage(images[imageSeq.frame], context);
-}
+  // ensure first available image draws when it's ready
+  (function attachFirstLoads() {
+    for (let i = 0; i < Math.min(5, images.length); i++) {
+      images[i].addEventListener("load", function () {
+        if (imageSeq.frame === 1) render();
+      });
+    }
+  })();
 
-function scaleImage(img, ctx) {
-  var canvas = ctx.canvas;
-  var hRatio = canvas.width / img.width;
-  var vRatio = canvas.height / img.height;
-  var ratio = Math.max(hRatio, vRatio);
-  var centerShift_x = (canvas.width - img.width * ratio) / 2;
-  var centerShift_y = (canvas.height - img.height * ratio) / 2;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(
-    img,
-    0,
-    0,
-    img.width,
-    img.height,
-    centerShift_x,
-    centerShift_y,
-    img.width * ratio,
-    img.height * ratio
-  );
-}
+  // initial onload draw
+  images[1] && images[1].addEventListener("load", render);
 
-ScrollTrigger.create({
-  trigger: "#page>canvas",
-  pin: true,
-  scroller: `#main`,
-  start: `top top`,
-  end: `900% top`
-});
+  // pin the canvas section (pinType chosen by scrollerProxy earlier)
+  ScrollTrigger.create({
+    trigger: "#page>canvas",
+    pin: true,
+    scroller: "#main",
+    start: "top top",
+    end: isMobile ? "600% top" : "900% top",
+  });
+})();
