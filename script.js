@@ -3,7 +3,7 @@ function locomotive() {
 
   const locoScroll = new LocomotiveScroll({
     el: document.querySelector("#main"),
-    smooth: true ,
+    smooth: true,
   });
   locoScroll.on("scroll", ScrollTrigger.update);
 
@@ -11,7 +11,7 @@ function locomotive() {
     scrollTop(value) {
       return arguments.length
         ? locoScroll.scrollTo(value, 0, 0)
-        : locoScroll.scroll.instance.scroll.y;
+        : (locoScroll.scroll.instance.scroll.y || 0); // safer for mobile
     },
 
     getBoundingClientRect() {
@@ -23,11 +23,18 @@ function locomotive() {
       };
     },
 
-    pinType: document.querySelector("#main").style.transform
-      ? "transform"
-      : "fixed",
+    // Force transform pinning so mobile doesn't snap back
+    pinType: "transform",
   });
+
   ScrollTrigger.addEventListener("refresh", () => locoScroll.update());
+
+  // Refresh after everything loads
+  window.addEventListener("load", () => {
+    locoScroll.update();
+    ScrollTrigger.refresh();
+  });
+
   ScrollTrigger.refresh();
 }
 locomotive();
@@ -38,7 +45,6 @@ const context = canvas.getContext("2d");
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-
 
 window.addEventListener("resize", function () {
   canvas.width = window.innerWidth;
@@ -406,11 +412,10 @@ function scaleImage(img, ctx) {
   );
 }
 
-
 ScrollTrigger.create({
-  trigger:"#page>canvas",
+  trigger: "#page>canvas",
   pin: true,
   scroller: `#main`,
   start: `top top`,
-  end: `600% top`
+  end: `900% top`
 });
